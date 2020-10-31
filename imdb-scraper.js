@@ -3,7 +3,6 @@ const fetch = require("node-fetch");
 
 const URL = "https://www.imdb.com/find?s=tt&ttype=ft&ref_=fn_ft&q=";
 
-//  const movie = "28 Days Later  2002";
 
 function fuzzyMatch(input, str) {
   input = input.replace(/\s/g, "").toLowerCase();
