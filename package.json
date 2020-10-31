@@ -1,0 +1,30 @@
+{
+  "name": "movies-explorer",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder"
+  },
+  "author": "Mohamed Walid",
+  "license": "MIT",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.3",
+    "node-fetch": "^2.6.1"
+  },
+  "bulid": {
+    "appId": "com.moviesexplorer.moviesexplorer",
+    "productName": "Movies Explorer",
+    "win": {
+      "asar": false,
+      "target": "nsis"
+    },
+    "nsis": {
+      "deleteAppDataOnUninstall": true
+    }
+  },
+  "devDependencies": {
+    "electron": "^10.1.5",
+    "electron-builder": "^22.9.1"
+  }
+}
