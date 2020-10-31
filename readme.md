@@ -23,14 +23,19 @@ An app that gets information about the movies located at any folder on your comp
 
 ## Screenshots
  ### Home
-<img src="screenshots/1.png" alt="Home" width="750"/>
+ <p align="center">
+<img src="screenshots/1.PNG"/>
+</p>
 
----
 ### Loading
-<img src="screenshots/2.png" alt="Loading" width="750"/>
+ <p align="center">
+<img src="screenshots/2.PNG"/>
+</p>
 
----
+
 
 ### Display Movies
-<img src="screenshots/3.png" alt="Displayin Movies" width="750"/>
+ <p align="center">
+<img src="screenshots/3.PNG"/>
+</p>
 
