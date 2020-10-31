@@ -73,7 +73,7 @@ async function getMovieDetails(movie) {
   }
 }
 
-// Process the array in parallel
+// Process the array concurrency
 async function getMoviesDetails(movies) {
   const promises = await movies.map(
     async (movie) => await getMovieDetails(movie)
@@ -97,14 +97,6 @@ async function getMoviesDetails(movies) {
 }
 */
 
-// (async ()=>{
-//     console.log(await getMoviesDetails(movies))
-//     // await getMoviesDetails(movies)
-// })()
 
-//  console.log(fuzzyMatch('Jumanji : The Next Level  2019','Jumanji: The Next Level (2019'))
-// (async _=>{
-//     console.log(await getMovieDetails(movie))
-// })();
 
 module.exports = { getMoviesDetails, fuzzyMatch };
