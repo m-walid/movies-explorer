@@ -29,3 +29,6 @@ app.on("ready", () => {
       Menu.setApplicationMenu(mainMenu)
 });
 
+app.on('window-all-closed', function () {
+  if (process.platform !== 'darwin') app.quit()
+})
