@@ -2,7 +2,7 @@ const electron = require("electron");
 const url = require("url");
 const path = require("path");
 const { readdirSync } = require("fs");
-const { getMoviesDetails,getMovieDetails } = require("../imdb-scraper");
+const { getMoviesDetails, getMovieDetails } = require("../imdb-scraper");
 const { countReset } = require("console");
 const { dialog, shell } = electron.remote;
 
@@ -59,11 +59,15 @@ selectFolder.addEventListener("click", async () => {
   });
   const dirPath = dir.filePaths[0];
   if (dirPath) {
+    moviesDetails.searched = false;
+    moviesDetails.genre = null;
     cardsContainer.innerHTML = "";
+    searchElm.value='';
+    sortElm.innerText = "▲";
     selectFolder.innerText = dirPath;
     const titles = getDirectories(dirPath);
     moviesDetails.list = [];
-    document.querySelector(".counter").innerHTML ='<div class="loader">'
+    document.querySelector(".counter").innerHTML = '<div class="loader">';
     titles.forEach(async (title) => {
       let movie;
       try {
@@ -76,22 +80,27 @@ selectFolder.addEventListener("click", async () => {
         } else {
         }
       } catch (e) {
-        function repeat() {
-          setTimeout(async () => {
-            try {
-              movie = await getMovieDetails(title);
-              if (movie) {
-                moviesDetails.list.push(movie);
-                addMovieCard(movie);
-                document.querySelector(".counter").innerHTML =
-                  moviesDetails.list.length;
+        if (e.code === "ENOTFOUND") {
+          showError("please check your internet connection");
+        } else {
+          function repeat() {
+            setTimeout(async () => {
+              try {
+                movie = await getMovieDetails(title);
+                if (movie) {
+                  moviesDetails.list.push(movie);
+                  addMovieCard(movie);
+                  document.querySelector(".counter").innerHTML =
+                    moviesDetails.list.length;
+                }
+              } catch (e) {
+                console.error(e);
+                repeat();
               }
-            } catch (e) {
-              repeat();
-            }
-          }, 0);
+            }, 0);
+          }
+          repeat();
         }
-        repeat();
       }
     });
   }
