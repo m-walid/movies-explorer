@@ -27,10 +27,6 @@ An app that gets information about the movies located at any folder on your comp
 <img src="screenshots/1.PNG"/>
 </p>
 
-### Loading
- <p align="center">
-<img src="screenshots/2.PNG"/>
-</p>
 
 
 
