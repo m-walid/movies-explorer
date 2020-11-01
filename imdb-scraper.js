@@ -3,24 +3,19 @@ const fetch = require("node-fetch");
 
 const URL = "https://www.imdb.com/find?s=tt&ttype=ft&ref_=fn_ft&q=";
 
-
-function fuzzyMatch(input, str) {
-  input = input.replace(/\s/g, "").toLowerCase();
-  str = str.replace(/\s/g, "").toLowerCase();
-  //   console.log(input, str)
-  let i = 0,
-    j = 0;
-  while (j < str.length && i < input.length) {
-    if (input[i] === str[j]) {
-      i++;
-    }
-    j++;
-  }
-  return i < input.length ? false : true;
+function titleMatch(input, str) {
+  input = input.match(/(.+)(\d{4})/);
+  let title = input[1],
+    year = input[2];
+  title = title.trim().toLowerCase();
+  str.title = str.title.trim().toLowerCase().replace(/[:]/g, "");
+  return title === str.title && year === str.year;
 }
 
 async function getMovieLink(movie) {
-  movieEncoded = encodeURIComponent(movie); // special characters like &
+  input = movie.match(/(.+)(\d{4})/);
+  let title = input[1];
+  movieEncoded = encodeURIComponent(title); // special characters like &
   const req = await fetch(`${URL}${movieEncoded}`);
   const searchPage = await req.text();
   const $ = cheerio.load(searchPage);
@@ -31,10 +26,16 @@ async function getMovieLink(movie) {
       .find(".result_text")
       .map((i, elm) => $(elm))
       .get()
-      .find((elm) => fuzzyMatch(movie, elm.text()))
+      .find((elm) =>
+        titleMatch(movie, {
+          title: elm.find("a").text(),
+          year: elm.text().match(/(\d{4})/)[1],
+        })
+      )
       .find("a")
       .attr("href");
   } catch (e) {
+    console.log(e);
     movieURL = $(".findList").find(".result_text").find("a").attr("href");
     if (!movieURL) return false;
   }
@@ -72,7 +73,7 @@ async function getMovieDetails(movie) {
   }
 }
 
-// Process the array concurrency
+// Process the array in concurrency
 async function getMoviesDetails(movies) {
   const promises = await movies.map(
     async (movie) => await getMovieDetails(movie)
@@ -95,7 +96,9 @@ async function getMoviesDetails(movies) {
     return moviesDetails
 }
 */
+// const title = ''
+// getMovieDetails({title}).then(data=>{
+//   // console.log(data)
+// })
 
-
-
-module.exports = { getMoviesDetails, fuzzyMatch };
+module.exports = { getMoviesDetails };

@@ -2,7 +2,7 @@ const electron = require("electron");
 const url = require("url");
 const path = require("path");
 const { readdirSync } = require("fs");
-const { getMoviesDetails, fuzzyMatch } = require("../imdb-scraper");
+const { getMoviesDetails } = require("../imdb-scraper");
 const { dialog, shell } = electron.remote;
 
 const cardsContainer = document.querySelector(".cards-container");
@@ -69,6 +69,7 @@ selectFolder.addEventListener("click", async () => {
         6 * 1000
       );
       moviesDetails.list = await getMoviesDetails(titles);
+      document.querySelector(".counter").innerText = moviesDetails.list.length;
       moviesDetails.searched = false;
       moviesDetails.genre = null;
       sortElm.innerText = "▼";
@@ -198,4 +199,18 @@ function formatTitle(title) {
 
 function genreFilter(movie, genre) {
   return movie.genres.indexOf(genre) !== -1;
+}
+
+function fuzzyMatch(input, str) {
+  str = str.replace(/\s/g, "").toLowerCase();
+  input = input.replace(/\s/g, "").toLowerCase();
+  let i = 0,
+    j = 0;
+  while (j < str.length && i < input.length) {
+    if (input[i] === str[j]) {
+      i++;
+    }
+    j++;
+  }
+  return i < input.length ? false : true;
 }
