@@ -73,7 +73,6 @@ async function getMovieDetails(movie) {
   }
 }
 
-// Process the array in concurrency
 async function getMoviesDetails(movies) {
   const promises = await movies.map(
     async (movie) => await getMovieDetails(movie)
@@ -84,21 +83,5 @@ async function getMoviesDetails(movies) {
   return moviesDetails;
 }
 
-/*
-///////////////////////////////// This is a worse approach because every movie has to wait for the previous movie to finish
-async function getMoviesDetails(movies) {
-  const moviesDetails = [];
-  const len = movies.length;
-  for (let i = 0; i < len; i++) {
-    moviesDetails.push(await getMovieDetails(movies[i]))
-    // console.log(await getMovieDetails(movies[i]));
-  }
-    return moviesDetails
-}
-*/
-// const title = ''
-// getMovieDetails({title}).then(data=>{
-//   // console.log(data)
-// })
 
-module.exports = { getMoviesDetails };
+module.exports = { getMoviesDetails,getMovieDetails };

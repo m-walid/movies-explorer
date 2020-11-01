@@ -2,12 +2,13 @@ const electron = require("electron");
 const url = require("url");
 const path = require("path");
 const { readdirSync } = require("fs");
-const { getMoviesDetails } = require("../imdb-scraper");
+const { getMoviesDetails,getMovieDetails } = require("../imdb-scraper");
+const { countReset } = require("console");
 const { dialog, shell } = electron.remote;
 
 const cardsContainer = document.querySelector(".cards-container");
 const selectFolder = document.querySelector(".folder-btn");
-const loader = document.querySelector(".loading");
+// const loader = document.querySelector(".loader");
 const searchElm = document.querySelector(".search");
 const sortElm = document.querySelector(".arrow-rating");
 const genresElm = document.querySelector(".select-genre");
@@ -61,31 +62,38 @@ selectFolder.addEventListener("click", async () => {
     cardsContainer.innerHTML = "";
     selectFolder.innerText = dirPath;
     const titles = getDirectories(dirPath);
-    loader.style.display = "block";
-    let t1;
-    try {
-      t1 = setTimeout(
-        () => (loader.querySelector(".loading-msg").style.display = "block"),
-        6 * 1000
-      );
-      moviesDetails.list = await getMoviesDetails(titles);
-      document.querySelector(".counter").innerText = moviesDetails.list.length;
-      moviesDetails.searched = false;
-      moviesDetails.genre = null;
-      sortElm.innerText = "▼";
-      moviesDetails.list
-        .sort((a, b) => parseFloat(b.rating) - parseFloat(a.rating))
-        .forEach((movie) => addMovieCard(movie));
-    } catch (e) {
-      showError(
-        "An error has occured please check your internet and try again uwu"
-      );
-      console.log(e);
-    } finally {
-      clearTimeout(t1);
-      loader.querySelector(".loading-msg").style.display = "none";
-      loader.style.display = "none";
-    }
+    moviesDetails.list = [];
+    document.querySelector(".counter").innerHTML ='<div class="loader">'
+    titles.forEach(async (title) => {
+      let movie;
+      try {
+        movie = await getMovieDetails(title);
+        if (movie) {
+          moviesDetails.list.push(movie);
+          addMovieCard(movie);
+          document.querySelector(".counter").innerHTML =
+            moviesDetails.list.length;
+        } else {
+        }
+      } catch (e) {
+        function repeat() {
+          setTimeout(async () => {
+            try {
+              movie = await getMovieDetails(title);
+              if (movie) {
+                moviesDetails.list.push(movie);
+                addMovieCard(movie);
+                document.querySelector(".counter").innerHTML =
+                  moviesDetails.list.length;
+              }
+            } catch (e) {
+              repeat();
+            }
+          }, 0);
+        }
+        repeat();
+      }
+    });
   }
 });
 
