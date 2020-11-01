@@ -73,14 +73,28 @@ async function getMovieDetails(movie) {
   }
 }
 
-async function getMoviesDetails(movies) {
-  const promises = await movies.map(
-    async (movie) => await getMovieDetails(movie)
-  );
-  const moviesDetails = (await Promise.all(promises)).filter(
-    (elm) => elm !== null
-  );
-  return moviesDetails;
+async function getMoviesDetails(movies,callback) {
+  const queue = movies;
+  const maxSimRequests = 5;
+  let currentRequests = 0;
+  let i = 0;
+  const fetchInterval = setInterval(async () => {
+    if (queue.filter((movie) => movie).length === 0) {
+      // all requests are done
+      clearInterval(fetchInterval);
+    }
+    if (currentRequests >= maxSimRequests || i > queue.length - 1) {
+      //skip if the current requests are more than max or if the last request reached
+      return;
+    }
+    const currentIndex = i++;
+    const currentMovie = queue[currentIndex];
+    currentRequests++;
+    result = await getMovieDetails(currentMovie); //get current movie
+    if (result) callback(result);
+    currentRequests--;
+    delete queue[currentIndex]; //set  current movie to undefined in the queue when finished
+  }, 300);
 }
 
 

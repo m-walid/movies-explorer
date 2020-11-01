@@ -62,46 +62,16 @@ selectFolder.addEventListener("click", async () => {
     moviesDetails.searched = false;
     moviesDetails.genre = null;
     cardsContainer.innerHTML = "";
-    searchElm.value='';
+    searchElm.value = "";
     sortElm.innerText = "▲";
     selectFolder.innerText = dirPath;
     const titles = getDirectories(dirPath);
     moviesDetails.list = [];
     document.querySelector(".counter").innerHTML = '<div class="loader">';
-    titles.forEach(async (title) => {
-      let movie;
-      try {
-        movie = await getMovieDetails(title);
-        if (movie) {
-          moviesDetails.list.push(movie);
-          addMovieCard(movie);
-          document.querySelector(".counter").innerHTML =
-            moviesDetails.list.length;
-        } else {
-        }
-      } catch (e) {
-        if (e.code === "ENOTFOUND") {
-          showError("please check your internet connection");
-        } else {
-          function repeat() {
-            setTimeout(async () => {
-              try {
-                movie = await getMovieDetails(title);
-                if (movie) {
-                  moviesDetails.list.push(movie);
-                  addMovieCard(movie);
-                  document.querySelector(".counter").innerHTML =
-                    moviesDetails.list.length;
-                }
-              } catch (e) {
-                console.error(e);
-                repeat();
-              }
-            }, 0);
-          }
-          repeat();
-        }
-      }
+    getMoviesDetails(titles, (movie) => {
+      moviesDetails.list.push(movie);
+      addMovieCard(movie);
+      document.querySelector(".counter").innerHTML = moviesDetails.list.length;
     });
   }
 });
@@ -123,12 +93,10 @@ cardsContainer.addEventListener("click", (e) => {
 //search movies
 searchElm.addEventListener("keyup", () => {
   let list = moviesDetails.list;
-  if (list && moviesDetails.genre !== null) {
-    list = moviesDetails.list.filter((movie) =>
-      genreFilter(movie, moviesDetails.genre)
-    );
-  }
   if (list) {
+    if (moviesDetails.genre !== null) {
+      list = list.filter((movie) => genreFilter(movie, moviesDetails.genre));
+    }
     cardsContainer.innerHTML = "";
     if (!/^\s*$/.test(searchElm.value)) {
       moviesDetails.searched = true;
@@ -147,8 +115,14 @@ searchElm.addEventListener("keyup", () => {
 
 // sort by rating
 sortElm.addEventListener("click", () => {
-  const list = moviesDetails.list;
+  let list = moviesDetails.list;
   if (list) {
+    if (moviesDetails.genre !== null) {
+      list = list.filter((movie) => genreFilter(movie, moviesDetails.genre));
+    }
+    if (moviesDetails.searched !== false) {
+      list = list.filter((movie) => fuzzyMatch(searchElm.value, movie.title));
+    }
     cardsContainer.innerHTML = "";
     if (sortElm.innerText === "▲") {
       sortElm.innerText = "▼";
@@ -169,12 +143,11 @@ genresElm.addEventListener("change", () => {
   const genre = genresElm.value;
   let list = moviesDetails.list;
   cardsContainer.innerHTML = "";
-  if (list && moviesDetails.searched !== null) {
-    list = moviesDetails.list.filter((movie) =>
-      fuzzyMatch(searchElm.value, movie.title)
-    );
-  }
+
   if (list && genre != "0") {
+    if (moviesDetails.searched !== false) {
+      list = list.filter((movie) => fuzzyMatch(searchElm.value, movie.title));
+    }
     list
       .filter((movie) => genreFilter(movie, genre))
       .forEach((movie) => addMovieCard(movie));
