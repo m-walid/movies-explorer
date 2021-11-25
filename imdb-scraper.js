@@ -51,19 +51,15 @@ async function getMovieDetails(movie) {
     const $ = cheerio.load(moviePage);
     const movieDetails = {
       title: $("h1").text().trim(),
-      rating: $('span[itemprop="ratingValue"]').text(),
-      votes: $('span[itemprop="ratingCount"]').text(),
+      rating: $('.AggregateRatingButton__RatingScore-sc-1ll29m0-1').first().text(),
+      votes: $('.AggregateRatingButton__TotalRatingAmount-sc-1ll29m0-3.jkCVKJ').first().text(),
       time: $("time").first().text().replace(/\s\s+/g, ""),
-      genres: $("h4")
-        .map((i, elm) => $(elm))
-        .get()
-        .find((elm) => elm.text().trim() === "Genres:")
-        .parent()
-        .find("a")
-        .map((i, elm) => $(elm).text().trim())
-        .get(),
+      genres: $(".ipc-metadata-list-item__label").filter(function () {
+        return $(this).text().trim() === 'Genres';
+      }).parent().find("a").map((i, elm) => $(elm).text().trim()
+      ).get(),
       summary: $(".summary_text").text().trim(),
-      poster: $(".poster img").first().attr("src"),
+      poster: $(".ipc-image").first().attr("src"),
       link: movieURL,
       path: movie.path,
     };
@@ -73,7 +69,7 @@ async function getMovieDetails(movie) {
   }
 }
 
-async function getMoviesDetails(movies,callback) {
+async function getMoviesDetails(movies, callback) {
   const queue = movies;
   const maxSimRequests = 5;
   let currentRequests = 0;
@@ -98,4 +94,4 @@ async function getMoviesDetails(movies,callback) {
 }
 
 
-module.exports = { getMoviesDetails,getMovieDetails };
+module.exports = { getMoviesDetails, getMovieDetails };
